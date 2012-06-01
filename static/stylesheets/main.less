@@ -1,0 +1,90 @@
+@page-default-font-color:   #FFF;
+@element-border:            #BBB;
+@element-color:             #666;
+@column-header-color:       #555;
+@page-background:           #333;
+
+@input-background-color:    #EEE;
+
+@column-width:              30%;
+
+body {
+    background-color:       @page-background;
+    color:                  @page-default-font-color;
+    font-family:            Georgia, Arial, sans-serif;
+    font-size:              0.8em;
+    
+    /* background: -moz-linear-gradient( top,  #333,  #111); */
+}
+
+.slide {
+    width:                  @column-width;
+    padding:                0.5em;
+    overflow:               auto;
+}
+
+.header {
+    background-color:       @column-header-color;
+    border-bottom:          0.2em solid white;
+    padding:                0.6em;
+    border-radius:          0.25em;
+    -moz-border-radius:     0.25em;
+    font-size:              26px;
+    text-align:             left;
+    font-family:            Georgia, Arial, sans-serif;
+    cursor:                 pointer;
+}
+
+.form {
+    text-align:             right;
+}
+
+.element, .action {
+    /* colors */
+    background-color:       @element-color;
+    /* metrics */
+    margin:                 0.3em 0.1em 0.3em 1em;
+    border-right:           0.2em solid @element-border;
+    padding:                0.75em;
+    overflow:               hidden;
+    /* form */
+    border-radius:          0.2em;
+    -moz-border-radius:     0.2em;
+    
+    input {
+        font-family:            monospace;
+        font-size:              1.6em;
+        font-weight:            bold;
+        background-color:       @input-background-color;
+        color:                  #000;    
+        
+        border:                 0.1em solid #BBB;
+        border-bottom:          0.2em solid #BBB;
+        border-top:             0.2em solid #BBB;
+        padding:                0.3em;
+        margin:                 0.3em;
+        border-radius:          0.2em;
+        -moz-border-radius:     0.2em;    
+    }
+    
+    a {
+        color:                  @page-default-font-color;
+        font-style:             italic;
+    }
+   
+}
+
+.action {
+    color:                  #CCC;   /* unimplemented actions are greyed out */
+    font-size:              1.4em;
+    
+    a {
+        color:                  @page-default-font-color;
+        font-style:             italic;        
+    }
+}
+
+
+
+
+

@@ -1,0 +1,124 @@
+body {
+    background-color: #333;
+    color: #FFF;
+    font-family: Georgia, Arial, sans-serif;
+    /* background: -moz-linear-gradient( top,  #333,  #111); */
+    font-size: 0.8em;
+}
+
+
+
+.quantity {
+    float: right;
+    padding: 0.1em;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    border: 0.2em solid #BBB;
+}
+.quantity input {
+    padding: 0.4em;
+    margin: none;
+    width: 3em;
+    text-align: right;
+    font-family: monospace;
+    font-weight: bold;
+    border: none;
+}
+
+
+.slide {
+    /* border: 1px dashed red;*/
+    width: 30%;
+    padding: 0.5em;
+    overflow: auto;
+}
+
+
+.header {
+    padding: 0.6em;
+    border-radius: 0.25em;
+    -moz-border-radius: 0.25em;
+    font-family: Georgia, Arial, sans-serif;
+    border-bottom: 0.2em solid white;
+    color: #FFF;
+    font-size: 26px;
+    text-align: left;
+    background-color: #555;
+    cursor: pointer;
+}   
+
+.element, .person, .article, .date, .confirm {
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    background-color: #666;
+    margin: 0.3em 0.1em 0.3em 1em;
+    border-right: 0.2em solid #BBB;
+    padding: 0.75em;
+    overflow: hidden;
+}
+
+.date {
+    margin: 0.5em 0.0em 0em 0.3em;
+    border: 0.1em solid #BBB;
+    padding: 0.2em; 
+    font-size: 1.4em;
+} 
+
+
+
+.article {
+    margin: 0.3em 0.1em 0.3em 1em;
+    border-right: 0.2em solid #BBB;
+    padding: 0.75em;
+    cursor: pointer;
+}
+
+.person {
+    padding-bottom: 1em;
+}
+
+.person .title {
+    padding: 0.2em;
+    margin-bottom: 0.4em;
+    font-size: 1.3em;
+}
+
+.form {
+    text-align: right;
+}
+
+.element input, 
+.person input {
+    font-family: monospace;
+    font-size: 1.6em;
+    font-weight: bold;
+    background-color: #EEE;
+    color: #000;    
+    
+    border: 0.1em solid #BBB;
+    border-bottom: 0.2em solid #BBB;
+    border-top: 0.2em solid #BBB;
+    padding: 0.3em;
+    margin: 0.3em;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+}
+
+.person input {
+    width: 75%;
+}
+
+.person .placeholder {
+    width: 75%;
+    margin: 0.2em;
+    padding: 0.3em;
+    border: 0.2em dashed #BBB;
+    background-color: inherit;
+
+    border-radius: 0.2em;
+    -moz-border-radius: 0.4em;    
+}
+
+.confirm {
+    min-height: 10em;
+}

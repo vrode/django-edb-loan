@@ -1,0 +1,7 @@
+{% for e in column %}
+    {% if forloop.first %}
+    <div class="header">► {{ e }}</div>
+    {% else %}
+    {% include "elements/hyperlink.html" %}
+    {% endif %}
+{% endfor %}

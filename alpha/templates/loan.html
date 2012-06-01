@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{{ title }}</title>
+    
+    <!-- jQuery -->
+    <script src="/static/javascripts/jQuery-1.7.1.min.js"></script>
+    
+    <!-- fathom script -->
+    <script src="/static/javascripts/fathom.js"></script>
+    
+    <!-- date script -->
+    <script src="/static/javascripts/date.js"></script>
+
+    <!-- jquery ui scripts -->
+    <script src="/static/javascripts/jquery.ui.core.min.js"></script>
+    <script src="/static/javascripts/jquery.ui.datepicker.min.js"></script>                    
+    <script src="/static/javascripts/jquery.ui.datepicker-no.js"></script>
+    
+
+    
+    <!-- initialize fathom -->
+    <script>
+        $(document).ready(function()	{
+            var fathom = new Fathom('#presentation');
+        });
+        
+    </script>
+    
+    <!-- initialize datepicker -->
+    <script>
+        $(function() {
+            $( "#timeFetched" ).datepicker({ dateFormat: 'yy-mm-dd' });
+            $( "#timeExpired" ).datepicker({ dateFormat: 'yy-mm-dd' });
+        });        
+    </script>
+    
+    <!-- jquery ui stylesheets -->
+    <link href="/static/stylesheets/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <!-- less stylesheets (must be loaded prior to the script) -->
+    <link href="/static/stylesheets/loan.less" rel="stylesheet/less" type="text/css" />
+    
+    <!-- less.js scripts -->
+    <script src="/static/javascripts/less-1.3.0.min.js"></script>    
+    
+</head>
+<body>
+
+
+
+<div id="presentation">
+<form id="loan" action="/loan/process/" method="post">{% csrf_token %}
+    <div class="slide">
+        <div class="header">► Personalia</div>
+        
+        <div class="person">
+            <div class="title">Fra (administrator)</div>
+            <div class="form">
+                <div><label>kortnr.</label>
+                    <input type="text" name="fromPerson" />
+                </div>
+                <div><label>passord.</label>
+                    <input type="password" name="adminPassword" />
+                </div>
+            </div>
+        </div>            
+        
+        <div class="person">
+            <div class="title">Til (låner)</div>
+            <div class="form">
+                <label>kortnr.</label>
+                <input type="text" name="toPerson" />
+            </div>                
+        </div>                        
+        
+    </div>    
+
+    <div class="slide">
+        <div class="header">► Artikler</div>       
+        
+        <div class="search">
+            <input  type="text" 
+                    value="Les av koden eller tast inn navn" />
+        </div> 
+        
+        {% for entity in entities %}
+        <div class="article">
+            <div>
+                {{ entity.article.name }}
+                <input type="checkbox" 
+                        class="checkbox" 
+                         name="Article{{ entity.article.pk }}" />
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
+    
+    <div class="slide">
+        <div class="header">► Periode</div>
+        
+        <div class="element">
+            Reservasjon?
+        </div>            
+
+        
+        <div class="date">
+            <div class="form">
+                <label>Henting</label>
+                <input type="text" id="timeFetched" 
+                       value=""
+                       name="timeFetched"
+                />
+            </div>
+        </div>               
+        
+        <div class="date">
+            <div class="form">
+                <label>Utløp</label>
+                <input type="text" id="timeExpired"
+                       value=""
+                       name="timeExpired"
+                />
+                <div class="suggestion">
+                    <a href="">Om 6 timer</a>, 
+                    <a href="">I morgen</a>, 
+                    <a href="">Om to Dager</a>, 
+                    <a href="">Om en uke</a>
+                </div>
+            </div>
+        </div>                       
+        
+    </div>
+
+    <div class="slide">
+        <div class="header">► Tilhørighet, sted og formål</div>
+        
+        <div class="cause">
+            <div class="title">Artiklene skal brukes i... <br/>
+            Disse drop-downs må hente relasjonsdata fra databasen.</div>
+        </div>
+
+        <div class="cause">
+            <div class="title">Foreningen</div>
+            <input type="text" name="society" />
+        </div>            
+        
+        <div class="cause">
+            <div class="title">Lokalet</div>
+            <input type="text" name="location" />
+        </div>  
+        
+        <div class="cause">
+            <div class="title">Eventet</div>
+            <input type="text" name="event" />
+        </div>
+        
+    </div>  
+    
+    <div class="slide">
+        <div class="header">■ Bekreft</div>
+        
+        <div class="confirm">
+        
+            <div class="quote">
+                Midlertidig kontrakt:<br/>
+                <br/>
+                Jeg, Ola Nordmann, 
+                representerer Foreningen Fyllautvalget og
+                ønsker å låne følgende utstyr fra
+                Chateau Neuf Servering AS.<br/>
+                <br/>
+                ...
+                <br/>
+                <br/>
+                Til sammen: 7 (syv) artikler.
+                <br/>
+                Herved plikter jeg å returnere utstyret i opprinnelig tilstand
+                og rapportere skadene og manglene påført på
+                utstyret før og i løpet av utlånstiden.<br/>
+                
+            </div>
+            <div class="button" onclick="javascript:document.getElementById('loan').submit();"
+            >Bekreft!</div>
+            <div class="button" onclick="javascript:document.getElementById('loan').submit();"
+            >Skriv ut!</div>
+            
+            
+        </div>             
+        
+    </div>        
+
+</form>    
+</div>
+
+
+
+</body>
+</html>
+    
+
