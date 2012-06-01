@@ -2,73 +2,77 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
-class LoanManager:
+class Terms:
 
-    def __init__( self, entity_prefix = "Entity" ):
-        self.entity_prefix = entity_prefix;
+    def __init__( self, request ):
+
+        def extract_entity_keys( request ):
+            # retain the elements that start with the prefix
+            entities = [ 
+                x for x in request.POST if x.startswith( self.entity_prefix ) 
+            ];
+            # strip the prefix
+            entities = map( lambda x: x.replace( "Entity", ""), entities );
+            return entities;     
     
-    def check( self, request ):
-        
         # Integers
-        entities = extract_entity_keys( request );
-        fromPerson = request.POST['fromPerson'];
-        toPerson = request.POST['toPerson'];
+        self.entities       = extract_entity_keys( request );
+        self.fromPerson     = request.POST['fromPerson'];
+        self.toPerson       = request.POST['toPerson'];
         # Strings
-        location = request.POST['location'];
-        society = request.POST['society'];
-        event = request.POST['event'];
+        self.location       = request.POST['location'];
+        self.society        = request.POST['society'];
+        self.event          = request.POST['event'];
         # Times
-        timeFetched = request.POST['timeFetched'];
-        timeExpired = request.POST['timeExpired'];
-    
-    def extract_entity_keys( request ):
-        # retain the elements that start with the prefix
-        entities = [ 
-            x for x in request.POST if x.startswith( self.entity_prefix ) 
-        ];
-        # strip the prefix
-        entities = map( lambda x: x.replace( "Entity", ""), entities );
-        
-        return entities;  
+        self.timeFetched    = request.POST['timeFetched'];
+        self.timeExpired    = request.POST['timeExpired'];
 
+    def entities_exist( self ):
+        pass;
+    
+    def entities_are_in_store( self ):
+        pass;
+    
+    def owner_exists( self ):
+        pass;
+    
+    def owner_has_rights( self ):
+        pass;
+    
+    def owner_has_correct_password( self ):
+        pass;
+    
+    def user_exists( self ):
+        pass;
+    
+    def user_is_not_blacklisted( self ):
+        pass;
+
+    def dates_are_consequent( self ):
+        pass;
+    
+  
+
+
+class Contract:
+    
     def check_entities( self, entities ):
         # Check if every entity exists
         # Check that every entity is available
         # Check each entities' condition (fit, need of repair)    
-        return True;
-        
     def check_owner( self, key, password = "" ):
-        # Check if exists
-        try:
-            User.objects.get( username = key );
-        except ObjectDoesNotExist:
-            return False;
-        
+        # Check if exists        
         # Check if has rights
         # Check if password is correct    
-        return True;
-    
     def check_user( self, key ):
         # Check if exists
-        try:
-            User.objects.get( username = key );
-        except ObjectDoesNotExist:
-            return False;
-                
         # Check if not blacklisted    
-        return True;
-    
     def check_dates( self, fetched, expired ):
         # Check that dates are consequent        
         # Check that period does not overlap with other reservations/loans    
-        return True;
-    
     def check_purpose( self ):
         # Check if society exists
             # Check user/society-correspondence
         # Check if event exists
         # Check if location is approved for use of equipment
-        # Calculate point scores and compare with conflicts/loan requirements    
-        return True;
-        
-        
+        # Calculate point scores and compare with conflicts/loan requirements

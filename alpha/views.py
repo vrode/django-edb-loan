@@ -80,6 +80,7 @@ def welcome( request ):
     );
     
     return render_to_response( 'welcome.html', {
+            'title': "Welcome",
             'columnWidthPercentage': column_width_percentage( columns ),
             'columns': columns,
         } 
