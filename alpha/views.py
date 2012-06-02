@@ -12,14 +12,6 @@ from django.contrib.auth.models import User
 
 def column_width_percentage( columns ):
     return ( 96.0 / len(columns) ) if ( len(columns) < 3 ) else 30
-    
-def extract_article_keys( request ):
-    # retain the elements that start with the prefix
-    return [ 
-        x.replace("Article", "") for x in request.POST # strip the prefix
-        if x.startswith( "Article" )  # from all that start with it
-    ];  
-
 
 
 def process_loan( request ):
@@ -27,9 +19,26 @@ def process_loan( request ):
     from controls import ArticleOrder;
     order = ArticleOrder( request );
     
+    missing = order.get_missing_article_keys();
+    
+    for entity in order.get_flat_entity_order():
+        loan = Loan(
+            entity          = entity,
+            fromPerson      = User.objects.get( username = "ils" ),
+            toPerson        = User.objects.get( username = "ils" ),
+            society         = "none",
+            event           = "none",
+            location        = "none",
+            timeFetched     = request.POST['timeFetched'],
+            timeExpired     = request.POST['timeExpired']
+        );
+        loan.save();
+        
+        
+         
     return render_to_response( "clean.html", {
             'content': order.get_article_order(),
-            'collection': map( lambda x: x.entities[0].article.name, order.get_entity_order()),
+            'collection': missing,
             'title': 'listing',
         }
     );
@@ -41,7 +50,7 @@ def temporary_loan( request ):
     
     columns = (
         [ "POST" ] + request.POST.items(),
-        [ "GET"] + request.GET.items(),
+        [ "GET" ] + request.GET.items(),
         [ "Loan Order" ] + \
             map( 
                 lambda x: ( x, Article.objects.get(pk=x).name ), 

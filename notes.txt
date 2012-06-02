@@ -1,3 +1,10 @@
+loan.js
+
+- Make a counting script that saves the total number of elements
+
+
+
+
 - Pushing project fast onto a remote repository?
 git commit -m '[commit]'
 git push -u origin master

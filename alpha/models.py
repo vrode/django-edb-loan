@@ -35,7 +35,7 @@ class Code( models.Model ):
     
     
 class Loan( models.Model ):
-    entity          = models.ForeignKey( Entity );
+    entity          = models.ForeignKey( Entity, unique = True );
     fromPerson      = models.ForeignKey( User, related_name = "+" );
     toPerson        = models.ForeignKey( User, related_name = "+" );
     society         = models.TextField();

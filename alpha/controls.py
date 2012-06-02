@@ -15,6 +15,12 @@ class ArticleOrder:
             if x.startswith( self.prefix )
         ];
     
+    def get_missing_article_keys( self ):
+        return [ a
+            for a in self.get_article_order().items()
+            if a[1] == None
+        ];
+    
     def get_article_order( self ):
         """ 
         Takes in article keys from the request and finds
@@ -30,6 +36,7 @@ class ArticleOrder:
                 result[article_key] = article[0];
             else:
                 result[article_key] = None;
+        
         return result;
     
     def get_article_names( self ):
@@ -56,15 +63,7 @@ class ArticleOrder:
         # Find the existing entities
         catalogue = []
         for article in self.get_article_objects():
-            entities = Entity.objects.filter( article = article );
-            if len( entities ) >= 1:
-                catalogue.append(
-                    EntityOffer( article, entities )
-                );
-            else:
-                catalogue.append(
-                    EntityOffer( article, None )
-                );
+            catalogue.append( EntityOffer( article ) )
         
         # Remove the entities that are on loan
         
@@ -74,27 +73,64 @@ class ArticleOrder:
         order = [];
         catalogue = self.get_entity_catalogue();
         for offer in catalogue:
-            if len( offer ) > 1:
-                from random import choice;
-                order.append( 
-                    # chooses the entity randomly
-                    EntityOffer( offer.article, [ choice( offer.entities) ] )
-                );
-            else:
-                order.append(
-                    EntityOffer( offer.article, [ offer.entities[0] ] )
-                );
+            order.append(
+                ( offer.article, offer.select() )
+            );
+            
         return order;
-                
+    
+    def get_flat_entity_order( self ):
+        order = [];
+        catalogue = self.get_entity_catalogue();
+        for offer in catalogue:
+            for entity in offer.select():
+                order.append( entity );
+        return order;
         
 class EntityOffer:
-    def __init__( self, article, entities ):
+    def __init__( self, article, quantity = 1 ):
         self.article = article;
-        self.entities = entities; # must be a sequence
+        self.quantity = quantity;
+        
+        candidates = \
+            Entity.objects.filter( article = article );
     
+        if len( candidates ) > 0:
+            self.entities = candidates;
+        else:
+            self.entities = None;
+        
+        
     def __len__( self ):
         return len( self.entities );
         
+    def select( self, quantity = 1 ):
+        """
+        Chooses a number of available entity from the list of existing.
+        Excludes the entities that are currently on loan, but does not
+        check their date.
+        """
+        from random import choice, sample;
+        candidates = [];
+         
+        # check if available (not on loan) depends on time-consistant loan table
+        available_entities = [];
+        for e in self.entities:
+            existing_loans = Loan.objects.filter( entity = e );
+            if len( existing_loans ) == 0:
+                available_entities.append( e );
+
+        # random choice from the available
+        if len( available_entities ) > 0:
+            if len( available_entities ) > quantity:
+                # there are enough available entities to fulfill the order
+                candidates = sample( available_entities, quantity );
+            else:
+                # there are not enough available entities to fulfill the order
+                candidates = available_entities; # max out the offer
+        
+        return candidates;
+    
         
         
         
