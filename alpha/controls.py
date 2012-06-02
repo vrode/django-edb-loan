@@ -1,9 +1,91 @@
 ﻿from django.contrib.auth.models import User
 from models import Article, Entity, Loan
     
-MAX_ENTITY_COUNT = 99;
+class ArticleRequirement:
+    def __init__( self, article_key, quantity, article_key_prefix = "Article" ):
+        
+        self.article_key = \
+            article_key.replace( article_key_prefix, "" );
+        
+        try:
+            self.quantity = int( quantity );
+        except ValueError:
+            self.quantity = 0;
+        
+        self.article = self.get_article();
+    
+        
+    def __len__( self ):
+        return self.quantity;
+    
+    def __str__( self ):
+        return "%d: %s" % (self.quantity, self.article );
+    
+    def get_article( self ):
+        candidates = Article.objects.filter( pk = self.article_key );
+        if len( candidates ) == 1:
+            return candidates[0];
+        else:
+            return None;
+        
+    def get_entity_offer( self ):
+        if self.article is None:
+            return None;
+        else:
+            return EntityOffer( self.article, self.quantity );
+        
+        
+
+class ArticleOrder:
+    def __init__( self, request, prefix = "Article" ):
+        self.request = request;
+        self.prefix = prefix;
+    
+    def get_requirements( self ):
+        """
+        Extracts all, even zero quantity articles.
+        """
+        result = [];
+        for (key, quantity) in self.request.POST.items():
+            if key.startswith( self.prefix ):
+                result.append(
+                    ArticleRequirement( key, quantity )
+                );
+        return result;        
+    
+    def get_missing_articles( self ):
+        result = [];
+        for r in self.get_requirements():
+            if r.article is None:
+                result.append( r );
+        return result;
+    
+    def get_article_order( self ):
+        result = [];
+        for r in self.get_requirements():
+            if r.quantity > 0 and r.article is not None:
+                result.append( r );        
+        return result;
+        
+    def get_entity_order( self ):
+        result = [];
+        article_order = self.get_article_order();
+        for r in article_order:
+            offer = r.get_entity_offer();
+            result.append( offer );
+        return result;
+        
+    def get_flat_entity_order( self ):
+        result = [];
+        for offer in self.get_entity_order():
+            for entity in offer.select():
+                result.append( entity );
+        return result;
+        
     
 class ArticleManager:
+    MAX_ENTITY_COUNT = 99;
+    
     def __init__( self ):
         pass;
     
@@ -23,104 +105,13 @@ class ArticleManager:
         articles = Article.objects.all();
         for article in articles:
             catalogue.append( 
-                EntityOffer( article, quantity = MAX_ENTITY_COUNT ) 
+                EntityOffer( article, 
+                    quantity = ArticleManager.MAX_ENTITY_COUNT 
+                ) 
             );
         return catalogue;
             
-            
 
-
-class ArticleOrder:
-    
-    def __init__( self, request, prefix = "Article" ):
-        self.request = request;
-        self.prefix = prefix;
-    
-    def get_article_keys( self ):
-        return [ 
-            x.replace( self.prefix, "" ) for x in self.request.POST
-            if x.startswith( self.prefix )
-        ];
-    
-    def get_missing_article_keys( self ):
-        """
-        Missing article keys often suggest
-        1. an attempt of cross-site scripting
-        2. an unsyncronized deletion of an object in the database
-        """
-        return [ a
-            for a in self.get_article_order().items()
-            if a[1] == None
-        ];
-    
-    def get_article_order( self ):
-        """ 
-        Takes in article keys from the request and finds
-        the corresponding object in the database.
-        For each object that does not correspond to a database
-        object, puts a None into a missing pk-index position 
-        """
-        result = {};
-        article_keys = self.get_article_keys();
-        for article_key in article_keys:
-            article = Article.objects.filter( pk = article_key );
-            if len( article ) == 1:
-                result[article_key] = article[0];
-            else:
-                result[article_key] = None;
-        
-        return result;
-    
-    def get_article_names( self ):
-        return [ 
-            a.name 
-            for a in self.get_article_order().values() 
-            if a != None 
-        ];
-    
-    def get_article_objects( self ):
-        return [
-            o
-            for o in self.get_article_order().values()
-            if o != None
-        ];
-        
-    def get_entity_catalogue( self ):
-        """
-        This function collects all entities that correspond to
-        a particular article, then finds those that are available
-        for loan.
-        """
-        
-        # Find the existing entities
-        catalogue = []
-        for article in self.get_article_objects():
-            catalogue.append( EntityOffer( article ) )
-        
-        # Remove the entities that are on loan
-        
-        return catalogue;
-    
-    def get_entity_order( self ):
-        order = [];
-        catalogue = self.get_entity_catalogue();
-        for offer in catalogue:
-            order.append(
-                ( offer.article, offer.select() )
-            );
-            
-        return order;
-    
-    def get_flat_entity_order( self ):
-        order = [];
-        catalogue = self.get_entity_catalogue();
-        for offer in catalogue:
-            for entity in offer.select():
-                order.append( entity );
-        return order;
-
-    def get_loan( self ):
-        pass;
         
 class EntityOffer:
     def __init__( self, article, quantity = 1 ):
@@ -138,7 +129,13 @@ class EntityOffer:
     def __len__( self ):
         return len( self.entities );
         
-    def select( self, quantity = 1 ):
+    def __str__( self ):
+        return "%d: Candidates: %d Selected: id=%s" % \
+            ( self.quantity, 
+              len(self.entities),  
+              map ( lambda e: e.pk, self.select() ) );        
+        
+    def select( self ):
         """
         Chooses a number of available entity from the list of existing.
         Excludes the entities that are currently on loan, but does not
@@ -156,9 +153,9 @@ class EntityOffer:
 
         # random choice from the available
         if len( available_entities ) > 0:
-            if len( available_entities ) > quantity:
+            if len( available_entities ) > self.quantity:
                 # there are enough available entities to fulfill the order
-                candidates = sample( available_entities, quantity );
+                candidates = sample( available_entities, self.quantity );
             else:
                 # there are not enough available entities to fulfill the order
                 candidates = available_entities; # max out the offer

@@ -35,7 +35,7 @@
         $(function() {
             $( "#timeFetched" ).datepicker({ dateFormat: 'yy-mm-dd' });
             $( "#timeExpired" ).datepicker({ dateFormat: 'yy-mm-dd' });
-        });        
+        });    
     </script>
     
     <!-- jquery ui stylesheets -->
@@ -55,7 +55,7 @@
 <div id="presentation">
 <form id="loan" action="/loan/process/" method="post">{% csrf_token %}
     <div class="slide">
-        <div class="header">► Personalia</div>
+        <div id="a" class="header">► Personalia</div>
         
         <div class="person">
             <div class="title">Fra (administrator)</div>
@@ -87,13 +87,15 @@
                     value="Les av koden eller tast inn navn" />
         </div> 
         
+        <input name="Article2103129" value="209301" />
+        
         {% for article in articles %}
         <div class="article">
             <div>
                 {{ article.name }}
                 <input type="checkbox" 
                         class="checkbox" 
-                         name="{{ articlePrefix }} {{ article.pk }}" />
+                         <!--name="{{ articlePrefix }}{{ article.pk }}"--> />
             </div>
         </div>
         {% endfor %}
@@ -105,7 +107,10 @@
             <div>
                 {{ offer.article.name }}
                 <div class="quantity">
-                    0 / {{ offer.entities|length }}
+                    <input 
+                      style="width: 2em;" 
+                       name="{{ articlePrefix }}{{ offer.article.pk }}" 
+                        value="0" /> / {{ offer.entities|length }}
                 </div>
             </div>
         </div>
@@ -129,10 +134,7 @@
                        name="timeFetched"
                 />
             </div>
-        </div>
-        
-        <input name="Article1010" value="on" />
-        
+        </div>        
         
         <div class="date">
             <div class="form">

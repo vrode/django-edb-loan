@@ -1,3 +1,3 @@
-$(".article").mouseover(function () {
-      $(this).effect("highlight", {}, 3000);
-});
+$("div").mouseover( function(){
+  $("div").css( "background-color","yellow" );
+} );

@@ -26,5 +26,12 @@
 {% endfor %}
 </ul>
 
+<div>Flat order listing {{ listing|length }}</div>
+<ul>
+{% for element in listing %}
+    <li>{{ element }}</li>
+{% endfor %}
+</ul>
+
 </body>
 </html>

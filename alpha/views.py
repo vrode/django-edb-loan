@@ -16,23 +16,32 @@ def column_width_percentage( columns ):
     
     
 def console( request ):
-
-    manager = ArticleManager();
+    
+    order = ArticleOrder( request );
     
     return render_to_response( "clean.html", {
             'title': 'listing',
-            'collection': map( 
-                lambda e: ( e.article.name, len( e.entities ) ), 
-                manager.get_entity_catalogue() 
-            ),
-            'content': "Fuck off"
+            'collection': order.get_article_requirements(),
+            'content': "Empty"
         }
     );    
     
 def process_loan( request ):
     order = ArticleOrder( request );
     
-    for entity in order.get_flat_entity_order():
+    missing = map( lambda a: a,
+        order.get_missing_articles()
+    );
+    required = map( lambda a: a,
+        order.get_article_order()
+    );
+    acquired = map( lambda e: e,
+        order.get_entity_order()
+    );
+    
+    listing = order.get_flat_entity_order()
+    
+    for entity in listing:
         loan = Loan(
             entity          = entity,
             fromPerson      = User.objects.get( username = "ils" ),
@@ -44,15 +53,15 @@ def process_loan( request ):
             timeExpired     = request.POST['timeExpired']
         );
         
-        loan.save();
+        #loan.save();
         
         
-         
     return render_to_response( "contract.html", {
             'title': 'Contract',
-            'required': order.get_article_order().values(),
-            'missing': order.get_missing_article_keys(),
-            'acquired': order.get_flat_entity_order(),
+            'missing': missing,
+            'required': required,
+            'acquired': acquired,
+            'listing': listing,
         }
     );
 
@@ -63,24 +72,24 @@ def return_loan( request ):
 def process_return( request ):
     return render_to_response( "return.html", {} );    
     
-def temporary_loan( request ):
+# def temporary_loan( request ):
     
-    article_choices = extract_article_keys( request );
+    # article_choices = extract_article_keys( request );
     
-    columns = (
-        [ "POST" ] + request.POST.items(),
-        [ "GET" ] + request.GET.items(),
-        [ "Loan Order" ] + \
-            map( 
-                lambda x: ( x, Article.objects.get(pk=x).name ), 
-                article_choices
-            ),
-    );
+    # columns = (
+        # [ "POST" ] + request.POST.items(),
+        # [ "GET" ] + request.GET.items(),
+        # [ "Loan Order" ] + \
+            # map( 
+                # lambda x: ( x, Article.objects.get(pk=x).name ), 
+                # article_choices
+            # ),
+    # );
     
-    return render_to_response( 'generic.html', {
-        'columnWidthPercentage': column_width_percentage( columns ),
-        'columns': columns,
-    });
+    # return render_to_response( 'generic.html', {
+        # 'columnWidthPercentage': column_width_percentage( columns ),
+        # 'columns': columns,
+    # });
     
 @csrf_protect
 def loan( request ):
