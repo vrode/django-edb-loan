@@ -1,0 +1,43 @@
+- Pushing project fast onto a remote repository?
+git commit -m '[commit]'
+git push -u origin master
+
+- Adapting a new app to South?
+manage.py syncdb
+manage.py schemamigration [appname] --initial
+manage.py migrate [appname]
+
+- How can I avoid getting DoesNotExist exception from objects.get(pk=n) queries?
+Use filter(pk=n) instead.
+
+- Should I reduce the http requests to remove duplicate parameters?
+The forms automatically filter out non-uniquely named parameters. So there is
+no need to set(...) the request data.
+
+
+
+Rask fremvisning av resultater
+
+> Template:
+    <html>
+    <head>
+        <title>{{ title }}</title>
+    </head>
+    <body>
+    <div>{{ content }}</div>
+
+    <ul>
+    {% for element in collection %}
+        <li>{{ element }}</li>
+    {% endfor %}
+    </ul>
+    </body>
+    </html>
+
+> View:
+    return render_to_response( "clean.html", {
+            'content': order.get_article_order(),
+            'collection': map( lambda x: x.entities[0].article.name, order.get_entity_order()),
+            'title': 'listing',
+        }
+    );

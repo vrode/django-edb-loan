@@ -85,13 +85,13 @@
                     value="Les av koden eller tast inn navn" />
         </div> 
         
-        {% for entity in entities %}
+        {% for article in articles %}
         <div class="article">
             <div>
-                {{ entity.article.name }}
+                {{ article.name }}
                 <input type="checkbox" 
                         class="checkbox" 
-                         name="Article{{ entity.article.pk }}" />
+                         name="{{ articlePrefix }} {{ article.pk }}" />
             </div>
         </div>
         {% endfor %}
@@ -114,7 +114,10 @@
                        name="timeFetched"
                 />
             </div>
-        </div>               
+        </div>
+        
+        <input name="Article1010" value="on" />
+        
         
         <div class="date">
             <div class="form">

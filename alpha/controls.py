@@ -1,78 +1,107 @@
-﻿from models import Article, Entity, Loan
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-
-class Terms:
-
-    def __init__( self, request ):
-
-        def extract_entity_keys( request ):
-            # retain the elements that start with the prefix
-            entities = [ 
-                x for x in request.POST if x.startswith( self.entity_prefix ) 
-            ];
-            # strip the prefix
-            entities = map( lambda x: x.replace( "Entity", ""), entities );
-            return entities;     
+﻿from django.contrib.auth.models import User
+from models import Article, Entity, Loan
     
-        # Integers
-        self.entities       = extract_entity_keys( request );
-        self.fromPerson     = request.POST['fromPerson'];
-        self.toPerson       = request.POST['toPerson'];
-        # Strings
-        self.location       = request.POST['location'];
-        self.society        = request.POST['society'];
-        self.event          = request.POST['event'];
-        # Times
-        self.timeFetched    = request.POST['timeFetched'];
-        self.timeExpired    = request.POST['timeExpired'];
-
-    def entities_exist( self ):
-        pass;
-    
-    def entities_are_in_store( self ):
-        pass;
-    
-    def owner_exists( self ):
-        pass;
-    
-    def owner_has_rights( self ):
-        pass;
-    
-    def owner_has_correct_password( self ):
-        pass;
-    
-    def user_exists( self ):
-        pass;
-    
-    def user_is_not_blacklisted( self ):
-        pass;
-
-    def dates_are_consequent( self ):
-        pass;
-    
-  
 
 
-class Contract:
+class ArticleOrder:
     
-    def check_entities( self, entities ):
-        # Check if every entity exists
-        # Check that every entity is available
-        # Check each entities' condition (fit, need of repair)    
-    def check_owner( self, key, password = "" ):
-        # Check if exists        
-        # Check if has rights
-        # Check if password is correct    
-    def check_user( self, key ):
-        # Check if exists
-        # Check if not blacklisted    
-    def check_dates( self, fetched, expired ):
-        # Check that dates are consequent        
-        # Check that period does not overlap with other reservations/loans    
-    def check_purpose( self ):
-        # Check if society exists
-            # Check user/society-correspondence
-        # Check if event exists
-        # Check if location is approved for use of equipment
-        # Calculate point scores and compare with conflicts/loan requirements
+    def __init__( self, request, prefix = "Article" ):
+        self.request = request;
+        self.prefix = prefix;
+    
+    def get_article_keys( self ):
+        return [ 
+            x.replace( self.prefix, "" ) for x in self.request.POST
+            if x.startswith( self.prefix )
+        ];
+    
+    def get_article_order( self ):
+        """ 
+        Takes in article keys from the request and finds
+        the corresponding object in the database.
+        For each object that does not correspond to a database
+        object, puts a None into a missing pk-index position 
+        """
+        result = {};
+        article_keys = self.get_article_keys();
+        for article_key in article_keys:
+            article = Article.objects.filter( pk = article_key );
+            if len( article ) == 1:
+                result[article_key] = article[0];
+            else:
+                result[article_key] = None;
+        return result;
+    
+    def get_article_names( self ):
+        return [ 
+            a.name 
+            for a in self.get_article_order().values() 
+            if a != None 
+        ];
+    
+    def get_article_objects( self ):
+        return [
+            o
+            for o in self.get_article_order().values()
+            if o != None
+        ];
+        
+    def get_entity_catalogue( self ):
+        """
+        This function collects all entities that correspond to
+        a particular article, then finds those that are available
+        for loan.
+        """
+        
+        # Find the existing entities
+        catalogue = []
+        for article in self.get_article_objects():
+            entities = Entity.objects.filter( article = article );
+            if len( entities ) >= 1:
+                catalogue.append(
+                    EntityOffer( article, entities )
+                );
+            else:
+                catalogue.append(
+                    EntityOffer( article, None )
+                );
+        
+        # Remove the entities that are on loan
+        
+        return catalogue;
+    
+    def get_entity_order( self ):
+        order = [];
+        catalogue = self.get_entity_catalogue();
+        for offer in catalogue:
+            if len( offer ) > 1:
+                from random import choice;
+                order.append( 
+                    # chooses the entity randomly
+                    EntityOffer( offer.article, [ choice( offer.entities) ] )
+                );
+            else:
+                order.append(
+                    EntityOffer( offer.article, [ offer.entities[0] ] )
+                );
+        return order;
+                
+        
+class EntityOffer:
+    def __init__( self, article, entities ):
+        self.article = article;
+        self.entities = entities; # must be a sequence
+    
+    def __len__( self ):
+        return len( self.entities );
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            

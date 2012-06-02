@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 
 from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.template import RequestContext, Template
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 
@@ -9,22 +9,35 @@ from models import Article, Entity, Loan
 from django.contrib.auth.models import User
 
 
-#####################################################################
 
 def column_width_percentage( columns ):
     return ( 96.0 / len(columns) ) if ( len(columns) < 3 ) else 30
     
-def extract_entity_keys( request ):
-    entities = [x for x in request.POST if x.startswith( "Article" ) ];
-    entities = map( lambda x: x.replace( "Article", ""), entities );
-    return entities;
+def extract_article_keys( request ):
+    # retain the elements that start with the prefix
+    return [ 
+        x.replace("Article", "") for x in request.POST # strip the prefix
+        if x.startswith( "Article" )  # from all that start with it
+    ];  
 
-#####################################################################
 
 
 def process_loan( request ):
     
-    article_choices = extract_entity_keys( request );
+    from controls import ArticleOrder;
+    order = ArticleOrder( request );
+    
+    return render_to_response( "clean.html", {
+            'content': order.get_article_order(),
+            'collection': map( lambda x: x.entities[0].article.name, order.get_entity_order()),
+            'title': 'listing',
+        }
+    );
+
+
+def temporary_loan( request ):
+    
+    article_choices = extract_article_keys( request );
     
     columns = (
         [ "POST" ] + request.POST.items(),
@@ -43,11 +56,12 @@ def process_loan( request ):
     
 @csrf_protect
 def loan( request ):
-    entities = Entity.objects.all();
+    articles = Article.objects.all();
     
     return render_to_response( 'loan.html', {
             'title': "Loan",
-            'entities': entities,
+            'articles': articles,
+            'articlePrefix': "Article",
         },
         context_instance = RequestContext( request )
     )  
@@ -110,17 +124,20 @@ def populate( request ):
         ( Article( name = "VGA (skjerm) kabel" ) ),
     )
 
+    from random import randint # generates random number of copies of articles
+    
     for a in articles:
         a.save();
-        e = Entity( article = a );
-        e.save();
+        for copy in range( randint( 1,4 ) ):
+            e = Entity( article = a );
+            e.save();
     
     columns = (
         ( "Database", "The database is populated with test data." ),
     );
     
     return render_to_response( 'generic.html', {
-        'columnWidthPercentage': column_width_percentage(),
+        'columnWidthPercentage': column_width_percentage( columns ),
         'columns': columns
     } );  
     
