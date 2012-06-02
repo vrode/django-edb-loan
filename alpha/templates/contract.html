@@ -1,37 +1,62 @@
-<html>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{{ title }}</title>
+    
+    <!-- jQuery -->
+    <script src="/static/javascripts/jquery-1.7.1.min.js"></script>
+    
+    <!-- fathom script -->
+    <script src="/static/javascripts/fathom.js"></script>
+
+    <!-- jquery ui scripts -->
+    <script src="/static/javascripts/jquery.ui.core.min.js"></script>
+    
+    <!-- initialize fathom -->
+    <script>
+        $(document).ready( function() {
+            var fathom = new Fathom('#presentation');
+        } );
+    </script>
+    
+    <!-- jquery ui stylesheets -->
+    <link href="/static/stylesheets/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <!-- less stylesheets (must be loaded prior to the script) -->
+    <link href="/static/stylesheets/main.less" rel="stylesheet/less" type="text/css" />
+    
+    <!-- less.js scripts -->
+    <script src="/static/javascripts/less-1.3.0.min.js"></script>    
+    
+    <!-- style -->
+    <style type="text/css">
+        .slide {
+            width: {{ columnWidthPercentage }}%;
+        }
+    </style>
+    
 </head>
 <body>
 
 
-<div>Required: {{ required|length }}</div>
-<ul>
-{% for element in required %}
-    <li>{{ element }}</li>
-{% endfor %}
-</ul>
 
-<div>Missing: {{ missing|length }}</div>
-<ul>
-{% for element in missing %}
-    <li>{{ element }}</li>
+<div id="presentation">
+{% for column in columns %}
+    <div class="slide">
+    {% for listing in column %}
+        {% if forloop.first %}
+        <div class="header">► {{ listing }}</div>
+        {% else %}
+        {% for element in listing %}
+        <div class="element">{{ element }}</div>
+        {% endfor %}
+        {% endif %}
+    {% endfor %}
+    </div>    
 {% endfor %}
-</ul>
 
-<div>Acquired {{ acquired|length }}</div>
-<ul>
-{% for element in acquired %}
-    <li>{{ element }}</li>
-{% endfor %}
-</ul>
-
-<div>Flat order listing {{ listing|length }}</div>
-<ul>
-{% for element in listing %}
-    <li>{{ element }}</li>
-{% endfor %}
-</ul>
+</div>
 
 </body>
 </html>

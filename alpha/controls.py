@@ -1,6 +1,17 @@
 ﻿from django.contrib.auth.models import User
 from models import Article, Entity, Loan
-    
+from sys import maxint
+
+class LoanManager:
+    def get_entity_catalogue( self ):
+        result = [];
+        for a in Article.objects.all():
+            result.append(
+                EntityOffer( a, quantity = maxint )
+            );
+        return result;
+            
+  
 class ArticleRequirement:
     def __init__( self, article_key, quantity, article_key_prefix = "Article" ):
         
@@ -36,7 +47,7 @@ class ArticleRequirement:
         
         
 
-class ArticleOrder:
+class Order:
     def __init__( self, request, prefix = "Article" ):
         self.request = request;
         self.prefix = prefix;
@@ -58,6 +69,13 @@ class ArticleOrder:
         for r in self.get_requirements():
             if r.article is None:
                 result.append( r );
+        return result;
+        
+    def get_insufficient_offers( self ):
+        result = [];
+        for offer in self.get_entity_order():
+            if not offer.sufficient():
+                result.append( offer );
         return result;
     
     def get_article_order( self ):
@@ -81,37 +99,8 @@ class ArticleOrder:
             for entity in offer.select():
                 result.append( entity );
         return result;
-        
-    
-class ArticleManager:
-    MAX_ENTITY_COUNT = 99;
-    
-    def __init__( self ):
-        pass;
-    
-    def get_entities( self, article ):
-        return Entities.objects.filter( article = article );
-    
-    def get_available_entities( self, article ):
-        result = [];
-        for e in self.get_entities( article ):
-            existing_loans = Loan.objects.filter( entity = e );
-            if len( existing_loans ) == 0:
-                result.append( e );
-        return result;
-    
-    def get_entity_catalogue( self ):
-        catalogue = [];
-        articles = Article.objects.all();
-        for article in articles:
-            catalogue.append( 
-                EntityOffer( article, 
-                    quantity = ArticleManager.MAX_ENTITY_COUNT 
-                ) 
-            );
-        return catalogue;
-            
 
+        
         
 class EntityOffer:
     def __init__( self, article, quantity = 1 ):
@@ -130,10 +119,12 @@ class EntityOffer:
         return len( self.entities );
         
     def __str__( self ):
-        return "%d: Candidates: %d Selected: id=%s" % \
+        return "%d: Candidates: %d Selected: id=%s %s" % \
             ( self.quantity, 
               len(self.entities),  
-              map ( lambda e: e.pk, self.select() ) );        
+              map ( lambda e: e.pk, self.select() ),
+              self.sufficient()
+              );        
         
     def select( self ):
         """
@@ -162,7 +153,13 @@ class EntityOffer:
         
         return candidates;
     
-        
+    def sufficient( self ):
+        """
+        Tells whether the number of available entities is sufficient,
+        to satisfy the quantity requirements of the order.
+        """
+    
+        return ( self.quantity <= len( self.entities ) );
         
         
         

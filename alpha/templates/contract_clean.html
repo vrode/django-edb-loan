@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+
+
+<div>Required: {{ required|length }}</div>
+<ul>
+{% for element in required %}
+    <li>{{ element }}</li>
+{% endfor %}
+</ul>
+
+<div>Missing: {{ missing|length }}</div>
+<ul>
+{% for element in missing %}
+    <li>{{ element }}</li>
+{% endfor %}
+</ul>
+
+<div>Acquired {{ acquired|length }}</div>
+<ul>
+{% for element in acquired %}
+    <li>{{ element }}</li>
+{% endfor %}
+</ul>
+
+<div>Flat order listing {{ listing|length }}</div>
+<ul>
+{% for element in listing %}
+    <li>{{ element.article.name }} ({{ element.pk }})</li>
+{% endfor %}
+</ul>
+
+<div>Insufficient Offers {{ insufficient|length }}</div>
+<ul>
+{% for element in insufficient %}
+    <li>{{ element.article.name }}: {{ element.entities|length }} of {{ element.quantity }}</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

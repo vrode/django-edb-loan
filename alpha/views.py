@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_protect;
 from models import Article, Entity, Loan;
 from django.contrib.auth.models import User;
 
-from controls import ArticleOrder, ArticleManager;
+from controls import Order, LoanManager;
 
 
 def column_width_percentage( columns ):
@@ -17,7 +17,7 @@ def column_width_percentage( columns ):
     
 def console( request ):
     
-    order = ArticleOrder( request );
+    order = Order( request );
     
     return render_to_response( "clean.html", {
             'title': 'listing',
@@ -27,7 +27,7 @@ def console( request ):
     );    
     
 def process_loan( request ):
-    order = ArticleOrder( request );
+    order = Order( request );
     
     missing = map( lambda a: a,
         order.get_missing_articles()
@@ -39,7 +39,8 @@ def process_loan( request ):
         order.get_entity_order()
     );
     
-    listing = order.get_flat_entity_order()
+    listing = order.get_flat_entity_order();
+    insufficient = order.get_insufficient_offers();
     
     for entity in listing:
         loan = Loan(
@@ -55,46 +56,50 @@ def process_loan( request ):
         
         #loan.save();
         
-        
     return render_to_response( "contract.html", {
-            'title': 'Contract',
-            'missing': missing,
-            'required': required,
-            'acquired': acquired,
-            'listing': listing,
+            'title': "Contract",
+            'columns': (
+                (   "Ønskede",
+                    map( lambda e: ("%d %s" % (e.quantity, e.article.name)), required )
+                ),
+                (   "Manglende",
+                    map( lambda e: e,       missing )
+                ),
+                (   "Manglende antall",
+                    map( lambda e: e,       insufficient )
+                ),                
+                (   "Bekreftede",
+                    map( lambda e: e, acquired )
+                ),
+                (   "Alle",
+                    map( lambda e: e.article.name, listing )
+                ),                
+            )
         }
     );
+
+    
+    # return render_to_response( "contract.html", {
+            # 'title': 'Contract',
+            # 'missing': missing,
+            # 'required': required,
+            # 'acquired': acquired,
+            # 'listing': listing,
+            # 'insufficient': insufficient,
+        # }
+    # );
 
 
 def return_loan( request ):
     return render_to_response( "return.html", {} );
     
 def process_return( request ):
-    return render_to_response( "return.html", {} );    
-    
-# def temporary_loan( request ):
-    
-    # article_choices = extract_article_keys( request );
-    
-    # columns = (
-        # [ "POST" ] + request.POST.items(),
-        # [ "GET" ] + request.GET.items(),
-        # [ "Loan Order" ] + \
-            # map( 
-                # lambda x: ( x, Article.objects.get(pk=x).name ), 
-                # article_choices
-            # ),
-    # );
-    
-    # return render_to_response( 'generic.html', {
-        # 'columnWidthPercentage': column_width_percentage( columns ),
-        # 'columns': columns,
-    # });
+    return render_to_response( "return.html", {} );
     
 @csrf_protect
 def loan( request ):
     articles = Article.objects.all();
-    manager = ArticleManager();
+    manager = LoanManager();
     
     return render_to_response( 'loan.html', {
             'title': "Loan",

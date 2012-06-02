@@ -1,5 +1,7 @@
-loan.js
+contract.html (template)
+- Remove temporary contact, replace with Next/Verify button
 
+loan.js
 - Make a counting script that saves the total number of elements
 
 
@@ -20,31 +22,3 @@ Use filter(pk=n) instead.
 - Should I reduce the http requests to remove duplicate parameters?
 The forms automatically filter out non-uniquely named parameters. So there is
 no need to set(...) the request data.
-
-
-
-Rask fremvisning av resultater
-
-> Template:
-    <html>
-    <head>
-        <title>{{ title }}</title>
-    </head>
-    <body>
-    <div>{{ content }}</div>
-
-    <ul>
-    {% for element in collection %}
-        <li>{{ element }}</li>
-    {% endfor %}
-    </ul>
-    </body>
-    </html>
-
-> View:
-    return render_to_response( "clean.html", {
-            'content': order.get_article_order(),
-            'collection': map( lambda x: x.entities[0].article.name, order.get_entity_order()),
-            'title': 'listing',
-        }
-    );

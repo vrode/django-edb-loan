@@ -87,21 +87,8 @@
                     value="Les av koden eller tast inn navn" />
         </div> 
         
-        <input name="Article2103129" value="209301" />
-        
-        {% for article in articles %}
-        <div class="article">
-            <div>
-                {{ article.name }}
-                <input type="checkbox" 
-                        class="checkbox" 
-                         <!--name="{{ articlePrefix }}{{ article.pk }}"--> />
-            </div>
-        </div>
-        {% endfor %}
-        
-    <div class="header">► Artikler med antall</div>       
-                
+        <input type="hidden" name="Article2103129" value="209301" />    
+                    
         {% for offer in articleCatalogue %}
         <div class="article">
             <div>
