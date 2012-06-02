@@ -7,6 +7,9 @@
     <!-- jQuery -->
     <script src="/static/javascripts/jQuery-1.7.1.min.js"></script>
     
+    <!-- loan.js -->
+    <script src="/static/javascripts/loan.js"></script>
+    
     <!-- fathom script -->
     <script src="/static/javascripts/fathom.js"></script>
     
@@ -24,8 +27,7 @@
     <script>
         $(document).ready(function()	{
             var fathom = new Fathom('#presentation');
-        });
-        
+        });        
     </script>
     
     <!-- initialize datepicker -->
@@ -95,6 +97,19 @@
             </div>
         </div>
         {% endfor %}
+        
+    <div class="header">► Artikler med antall</div>       
+                
+        {% for offer in articleCatalogue %}
+        <div class="article">
+            <div>
+                {{ offer.article.name }}
+                <div class="quantity">
+                    0 / {{ offer.entities|length }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}        
         
     </div>
     

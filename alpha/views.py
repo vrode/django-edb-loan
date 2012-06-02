@@ -1,25 +1,36 @@
 ﻿# -*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext, Template
-from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render_to_response;
+from django.template import RequestContext, Template;
+from django.core.context_processors import csrf;
+from django.views.decorators.csrf import csrf_protect;
 
-from models import Article, Entity, Loan
-from django.contrib.auth.models import User
+from models import Article, Entity, Loan;
+from django.contrib.auth.models import User;
 
+from controls import ArticleOrder, ArticleManager;
 
 
 def column_width_percentage( columns ):
     return ( 96.0 / len(columns) ) if ( len(columns) < 3 ) else 30
+    
+    
+def console( request ):
 
-
+    manager = ArticleManager();
+    
+    return render_to_response( "clean.html", {
+            'title': 'listing',
+            'collection': map( 
+                lambda e: ( e.article.name, len( e.entities ) ), 
+                manager.get_entity_catalogue() 
+            ),
+            'content': "Fuck off"
+        }
+    );    
+    
 def process_loan( request ):
-    
-    from controls import ArticleOrder;
     order = ArticleOrder( request );
-    
-    missing = order.get_missing_article_keys();
     
     for entity in order.get_flat_entity_order():
         loan = Loan(
@@ -32,18 +43,26 @@ def process_loan( request ):
             timeFetched     = request.POST['timeFetched'],
             timeExpired     = request.POST['timeExpired']
         );
+        
         loan.save();
         
         
          
-    return render_to_response( "clean.html", {
-            'content': order.get_article_order(),
-            'collection': missing,
-            'title': 'listing',
+    return render_to_response( "contract.html", {
+            'title': 'Contract',
+            'required': order.get_article_order().values(),
+            'missing': order.get_missing_article_keys(),
+            'acquired': order.get_flat_entity_order(),
         }
     );
 
 
+def return_loan( request ):
+    return render_to_response( "return.html", {} );
+    
+def process_return( request ):
+    return render_to_response( "return.html", {} );    
+    
 def temporary_loan( request ):
     
     article_choices = extract_article_keys( request );
@@ -66,10 +85,12 @@ def temporary_loan( request ):
 @csrf_protect
 def loan( request ):
     articles = Article.objects.all();
+    manager = ArticleManager();
     
     return render_to_response( 'loan.html', {
             'title': "Loan",
             'articles': articles,
+            'articleCatalogue': manager.get_entity_catalogue(),
             'articlePrefix': "Article",
         },
         context_instance = RequestContext( request )
@@ -100,6 +121,10 @@ def welcome( request ):
         ( "Arkiv", 
             ( "Statistikk", False ),
         ),
+        ( "Testing",
+            ( "Populér testdata", "/populate/" ),
+            ( "Konsoll og logg", "/console/" ),
+        ),
     );
     
     return render_to_response( 'welcome.html', {
@@ -113,6 +138,7 @@ def populate( request ):
 
     Article.objects.all().delete()
     Entity.objects.all().delete()
+    Loan.objects.all().delete()
 
     articles = (
         ( Article( name = "Aktiv Høytaler" ) ),
@@ -141,7 +167,7 @@ def populate( request ):
             e = Entity( article = a );
             e.save();
     
-    columns = (
+    columns = ( "Done",
         ( "Database", "The database is populated with test data." ),
     );
     

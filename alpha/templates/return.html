@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{{ title }}</title>
+    
+    <!-- jQuery -->
+    <script src="/static/javascripts/jQuery-1.7.1.min.js"></script>
+    
+    <!-- fathom script -->
+    <script src="/static/javascripts/fathom.js"></script>
+    
+
+    
+    <!-- initialize fathom -->
+    <script>
+        $(document).ready(function()	{
+            var fathom = new Fathom('#presentation');
+        });
+        
+    </script>
+    
+    <!-- jquery ui stylesheets -->
+    <link href="/static/stylesheets/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <!-- less stylesheets (must be loaded prior to the script) -->
+    <link href="/static/stylesheets/loan.less" rel="stylesheet/less" type="text/css" />
+    
+    <!-- less.js scripts -->
+    <script src="/static/javascripts/less-1.3.0.min.js"></script>    
+    
+</head>
+<body>
+
+
+
+<div id="presentation">
+
+<form id="loan" action="/loan/return/process/" method="post">{% csrf_token %}
+    <div class="slide">
+        <div class="header">► Personalia</div>
+        
+        <div class="person">
+            <div class="title">Fra (administrator)</div>
+            <div class="form">
+                <div><label>kortnr.</label>
+                    <input type="text" name="fromPerson" />
+                </div>
+                <div><label>passord.</label>
+                    <input type="password" name="adminPassword" />
+                </div>
+            </div>
+        </div>            
+       
+    </div>
+    
+    
+    <div class="slide">
+    
+        <div class="header">► Artikler</div>       
+        
+        <div class="search">
+            <input type="text" value="Les av koden" />
+        </div>   
+    
+    </div>
+    
+    <div class="slide">
+        <div class="header">■ Bekreft</div>
+        
+        <div class="confirm">
+
+            <div class="button" onclick="javascript:document.getElementById('loan').submit();"
+            >Bekreft!</div>
+            <div class="button" onclick="javascript:document.getElementById('loan').submit();"
+            >Skriv ut!</div>
+                        
+        </div>             
+        
+    </div>        
+
+</form>    
+</div>
+
+
+
+</body>
+</html>
+    
+

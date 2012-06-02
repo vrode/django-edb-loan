@@ -1,6 +1,33 @@
 ﻿from django.contrib.auth.models import User
 from models import Article, Entity, Loan
     
+MAX_ENTITY_COUNT = 99;
+    
+class ArticleManager:
+    def __init__( self ):
+        pass;
+    
+    def get_entities( self, article ):
+        return Entities.objects.filter( article = article );
+    
+    def get_available_entities( self, article ):
+        result = [];
+        for e in self.get_entities( article ):
+            existing_loans = Loan.objects.filter( entity = e );
+            if len( existing_loans ) == 0:
+                result.append( e );
+        return result;
+    
+    def get_entity_catalogue( self ):
+        catalogue = [];
+        articles = Article.objects.all();
+        for article in articles:
+            catalogue.append( 
+                EntityOffer( article, quantity = MAX_ENTITY_COUNT ) 
+            );
+        return catalogue;
+            
+            
 
 
 class ArticleOrder:
@@ -16,6 +43,11 @@ class ArticleOrder:
         ];
     
     def get_missing_article_keys( self ):
+        """
+        Missing article keys often suggest
+        1. an attempt of cross-site scripting
+        2. an unsyncronized deletion of an object in the database
+        """
         return [ a
             for a in self.get_article_order().items()
             if a[1] == None
@@ -86,6 +118,9 @@ class ArticleOrder:
             for entity in offer.select():
                 order.append( entity );
         return order;
+
+    def get_loan( self ):
+        pass;
         
 class EntityOffer:
     def __init__( self, article, quantity = 1 ):
@@ -99,7 +134,6 @@ class EntityOffer:
             self.entities = candidates;
         else:
             self.entities = None;
-        
         
     def __len__( self ):
         return len( self.entities );
