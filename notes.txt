@@ -1,8 +1,16 @@
+Test Data Generator:
+    - What to do with duplicate codes? Since both QR and BAR-codes
+    coexist in the same table, how shall the uniqueness be restricted?
+
+welcome.html (template)
+    - Return delivery must be represented as a part of menu (widget-like) for
+    faster access.
+
 contract.html (template)
-- Remove temporary contact, replace with Next/Verify button
+    - Remove temporary contact, replace with Next/Verify button
 
 loan.js
-- Make a counting script that saves the total number of elements
+    - Make a counting script that saves the total number of elements
 
 
 

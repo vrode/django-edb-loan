@@ -7,6 +7,9 @@
     <!-- jQuery -->
     <script src="/static/javascripts/jQuery-1.7.1.min.js"></script>
     
+    <!-- loan.js -->
+    <script src="/static/javascripts/loan.js"></script>
+    
     <!-- fathom script -->
     <script src="/static/javascripts/fathom.js"></script>
     
@@ -16,8 +19,7 @@
     <script>
         $(document).ready(function()	{
             var fathom = new Fathom('#presentation');
-        });
-        
+        });  
     </script>
     
     <!-- jquery ui stylesheets -->
@@ -44,10 +46,10 @@
             <div class="title">Fra (administrator)</div>
             <div class="form">
                 <div><label>kortnr.</label>
-                    <input type="text" name="fromPerson" />
+                    <input type="text" name="owner" />
                 </div>
                 <div><label>passord.</label>
-                    <input type="password" name="adminPassword" />
+                    <input type="password" name="ownerPassword" />
                 </div>
             </div>
         </div>            
@@ -60,7 +62,8 @@
         <div class="header">► Artikler</div>       
         
         <div class="search">
-            <input type="text" value="Les av koden" />
+            <input type="text" value="" id="candidate" />
+            <textarea class="batch" id="batch" name="batch"></textarea>
         </div>   
     
     </div>

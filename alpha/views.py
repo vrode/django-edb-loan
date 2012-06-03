@@ -5,7 +5,7 @@ from django.template import RequestContext, Template;
 from django.core.context_processors import csrf;
 from django.views.decorators.csrf import csrf_protect;
 
-from models import Article, Entity, Loan;
+from models import *;
 from django.contrib.auth.models import User;
 
 from controls import Order, LoanManager;
@@ -150,9 +150,10 @@ def welcome( request ):
     
 def populate( request ):
 
-    Article.objects.all().delete()
-    Entity.objects.all().delete()
-    Loan.objects.all().delete()
+    Article.objects.all().delete();
+    Entity.objects.all().delete();
+    Loan.objects.all().delete();
+    Code.objects.all().delete();
 
     articles = (
         ( Article( name = "Aktiv Høytaler" ) ),
@@ -181,8 +182,18 @@ def populate( request ):
             e = Entity( article = a );
             e.save();
     
-    columns = ( "Done",
-        ( "Database", "The database is populated with test data." ),
+    for e in Entity.objects.all():
+        c = Code( # can create duplicate codes
+            code = "".join( [str(randint(0,9)) for i in range(11)] ),
+            entity = e,
+            family = "BAR"
+        );
+        c.save();
+    
+    columns = (
+            ( "Done",
+                ( "Database", "The database is populated with test data." ),
+            ),
     );
     
     return render_to_response( 'generic.html', {

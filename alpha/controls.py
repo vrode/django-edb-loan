@@ -2,6 +2,7 @@
 from models import Article, Entity, Loan
 from sys import maxint
 
+
 class LoanManager:
     def get_entity_catalogue( self ):
         result = [];
@@ -10,6 +11,9 @@ class LoanManager:
                 EntityOffer( a, quantity = maxint )
             );
         return result;
+        
+    def archive_loan( self ):
+        
             
   
 class ArticleRequirement:
