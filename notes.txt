@@ -13,7 +13,7 @@ loan.js
     - Make a counting script that saves the total number of elements
 
 
-
+Model inheritance: try to understand/play around for a while before using.
 
 - Pushing project fast onto a remote repository?
 git commit -m '[commit]'

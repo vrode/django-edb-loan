@@ -12,8 +12,6 @@ from controls import *;
 
 
 
-
-
 def column_width_percentage( columns ):
     return ( 96.0 / len(columns) ) if ( len(columns) < 3 ) else 30
     
@@ -80,7 +78,6 @@ def process_loan( request ):
             )
         }
     );
-
     
     # return render_to_response( "contract.html", {
             # 'title': 'Contract',
@@ -138,7 +135,7 @@ def welcome( request ):
             ( "Tilbakelevering", False ),
         ),
         ( "Artikkel", 
-            ( "Legg til en artikkel", False ), 
+            ( "Rediger vareutvalget", False ), 
             ( "Søk i artikkeldatabasen", False ), 
             ( "Lagerstatus", False ),
             ( "Varetellingsliste", False ), 
@@ -200,9 +197,16 @@ def populate( request ):
             e = Entity( article = a );
             e.save();
     
+    def generate_code( previous, total_length ):
+        next = str( int(previous) );
+        padding = total_length - len( next );
+        return ( padding * "0" ) + next;
+    
+    counter = 0;
     for e in Entity.objects.all():
+        counter += 1;
         c = Code( # can create duplicate codes
-            code = "".join( [str(randint(0,9)) for i in range(11)] ),
+            code = generate_code( counter, 12 ),
             entity = e,
             family = "BAR"
         );
