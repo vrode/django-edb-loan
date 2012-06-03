@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     url( r'^loan/process/$',         'alpha.views.process_loan' ),
     
     url( r'^return/$',               'alpha.views.return_loan' ),
-    url( r'^return/process$',        'alpha.views.process_return' ),
+    url( r'^return/process/$',       'alpha.views.process_return' ),
     
     url( r'^console/$',              'alpha.views.console' ),
     url( r'^populate/$',             'alpha.views.populate' ),

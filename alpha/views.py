@@ -5,10 +5,13 @@ from django.template import RequestContext, Template;
 from django.core.context_processors import csrf;
 from django.views.decorators.csrf import csrf_protect;
 
-from models import *;
 from django.contrib.auth.models import User;
 
-from controls import Order, LoanManager;
+from models import *;
+from controls import *;
+
+
+
 
 
 def column_width_percentage( columns ):
@@ -54,7 +57,7 @@ def process_loan( request ):
             timeExpired     = request.POST['timeExpired']
         );
         
-        #loan.save();
+        loan.save();
         
     return render_to_response( "contract.html", {
             'title': "Contract",
@@ -90,14 +93,30 @@ def process_loan( request ):
     # );
 
 
+@csrf_protect
 def return_loan( request ):
-    return render_to_response( "return.html", {} );
+    return render_to_response( "return.html", {
     
+        },
+        context_instance = RequestContext( request )
+    );
+
+@csrf_protect    
 def process_return( request ):
-    return render_to_response( "return.html", {} );
+    
+    order = ReturnOrder( request );
+    code_order = order.get_code_order();
+    order.execute_return();
+    
+    return render_to_response( 'clean.html', {
+            'content': code_order
+        },
+        context_instance = RequestContext( request )
+    );
     
 @csrf_protect
 def loan( request ):
+    
     articles = Article.objects.all();
     manager = LoanManager();
     
@@ -117,12 +136,11 @@ def welcome( request ):
         ( "Lån", 
             ( "Registrer Utlån", "/loan/" ), 
             ( "Tilbakelevering", False ),
-            ( "Lagerstatus", False ),
         ),
         ( "Artikkel", 
             ( "Legg til en artikkel", False ), 
             ( "Søk i artikkeldatabasen", False ), 
-            ( "List tilgjengelige artikler", False ), 
+            ( "Lagerstatus", False ),
             ( "Varetellingsliste", False ), 
             ( "Skaderapport", False ), 
         ),

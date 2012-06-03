@@ -1,6 +1,63 @@
 ﻿from django.contrib.auth.models import User
-from models import Article, Entity, Loan
+from models import *
 from sys import maxint
+
+
+
+class ReturnOrder:
+    def __init__( self, request, batch_separator = ";\n" ):
+        self.batch = request.POST['batch'].split( batch_separator );
+        self.batch = [c.replace( ";", "") for c in self.batch];
+        
+    def get_code_order( self ):
+        result = [];
+        for code in self.batch:
+            candidates = Code.objects.filter( code = code );
+            if len( candidates ) == 1:
+                result.append( 
+                    ( code, candidates[0].entity )
+                );
+            elif len( candidates ) == 0:
+                result.append( 
+                    ( code, None )
+                );
+            else:
+                pass; # exception: non-unique code occured
+        return result;
+        
+    def get_loan_order( self ):
+        result = [];
+        for ( code, entity ) in self.get_code_order():
+            candidates = Loan.objects.filter( entity = entity );
+            # [?] what if database contains multiple corrupted loans?
+            if len( candidates ) >= 1:
+                for loan in candidates:
+                    result.append( 
+                        ( entity, loan )
+                    );
+            else:
+                result.append( 
+                    ( entity, None )
+                );
+        return result;
+                
+    def execute_return( self ):
+        print self.get_loan_order()[0];
+        for ( entity, loan ) in self.get_loan_order():
+            if loan != None:
+                archived = ArchivedLoan(
+                    entity = loan.entity,
+                    fromPerson = loan.fromPerson,
+                    toPerson = loan.toPerson,
+                    society = loan.society,
+                    location = loan.location,
+                    event = loan.event,
+                    timeFetched = loan.timeFetched,
+                    timeExpired = loan.timeExpired
+                );
+                archived.save();
+                loan.delete();
+            
 
 
 class LoanManager:
@@ -12,7 +69,6 @@ class LoanManager:
             );
         return result;
         
-    def archive_loan( self ):
         
             
   
